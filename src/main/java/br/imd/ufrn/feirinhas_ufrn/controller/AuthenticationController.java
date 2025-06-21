@@ -1,49 +1,50 @@
 package br.imd.ufrn.feirinhas_ufrn.controller;
 
-import br.imd.ufrn.feirinhas_ufrn.domain.usuario.AuthenticationDTO;
-import br.imd.ufrn.feirinhas_ufrn.domain.usuario.CadastroDTO;
-import br.imd.ufrn.feirinhas_ufrn.domain.usuario.Usuario;
-import br.imd.ufrn.feirinhas_ufrn.repository.UsuarioRepo;
-import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
+import br.imd.ufrn.feirinhas_ufrn.dto.AuthDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.RegisterUserDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.mappers.UserMapper;
+import br.imd.ufrn.feirinhas_ufrn.services.AuthorizationService;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("auth")
+@RequiredArgsConstructor
 public class AuthenticationController {
+    private final AuthorizationService authService;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private UsuarioRepo usuarioRepo;
-
+    @SneakyThrows
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
+    public ResponseEntity<String> login(@Validated @RequestBody AuthDTO dto){
+        final String token = authService.authenticate(dto);
 
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
+        return ResponseEntity.ok(token);
+    }  
 
-        return ResponseEntity.ok().build();
 
+    @SneakyThrows
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDTO> registerUser(@Validated @RequestBody RegisterUserDTO data){
+        final User createdUser = this.authService.registerUser(data);
+        final UserResponseDTO dto = userMapper.userResponseDtoFromUser(createdUser);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto); 
     }
 
-    @PostMapping("/cadastro")
-    public ResponseEntity cadastroUsuario(@RequestBody @Valid CadastroDTO data){
-        if(this.usuarioRepo.findByEmail(data.email()) != null){
-            return ResponseEntity.badRequest().build();
-        }else {
-            String encryptePassword = new BCryptPasswordEncoder().encode(data.senha());
-            Usuario user = new Usuario(data.nome(), data.email(), encryptePassword, data.whatsapp(), data.role());
+    @SneakyThrows
+    @PostMapping("/registerAdmin")
+    public ResponseEntity<UserResponseDTO> registerAdmin(@Validated @RequestBody RegisterUserDTO data) {
+        final User createdUser = this.authService.registerUser(data);
+        final UserResponseDTO dto = userMapper.userResponseDtoFromUser(createdUser);
 
-            this.usuarioRepo.save(user);
-            return ResponseEntity.ok().build();
-        }
-    }
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    }    
 }
