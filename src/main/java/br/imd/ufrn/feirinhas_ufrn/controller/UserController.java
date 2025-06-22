@@ -9,11 +9,23 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    // Endpoint para listar todos os vendedores (usuários com papel de vendedor)
+    @GetMapping("/vendedores")
+    public List<User> listarVendedores() {
+        return userService.findAllVendedores();
+    }
+
+    // Endpoint para obter um vendedor específico pelo ID (com produtos e feirinhas)
+    @GetMapping("/vendedores/{id}")
+    public User buscarVendedorPorId(@PathVariable String id) {
+        return userService.findVendedorByIdWithProdutosAndFeirinhas(id);
+    }
 
     @GetMapping
     public List<User> listarUsuarios(){
