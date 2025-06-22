@@ -1,11 +1,15 @@
 package br.imd.ufrn.feirinhas_ufrn.domain.usuario;
 
+import br.imd.ufrn.feirinhas_ufrn.domain.feira.Feira;
+import br.imd.ufrn.feirinhas_ufrn.domain.produto.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Table(name = "users")
 @Entity
@@ -29,6 +33,12 @@ public class User{
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @OneToMany(mappedBy = "seller")
+    private List<Product> products;
+
+    @ManyToMany(mappedBy = "sellers")
+    private List<Feira> feiras;
 
     public User(String fullname, String email, String password, String whatsapp, UserRole role){
         this.fullname = fullname;
