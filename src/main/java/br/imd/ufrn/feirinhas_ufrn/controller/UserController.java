@@ -1,59 +1,84 @@
 package br.imd.ufrn.feirinhas_ufrn.controller;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
-import br.imd.ufrn.feirinhas_ufrn.dto.UserDTO;
-import br.imd.ufrn.feirinhas_ufrn.dto.UserDetailDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.UpdateUserDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserInfoResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
+import br.imd.ufrn.feirinhas_ufrn.mappers.UserMapper;
 import br.imd.ufrn.feirinhas_ufrn.services.UserService;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
-
+    private final UserMapper userMapper;
     private final UserService userService;
 
-    // Endpoint para listar todos os vendedores (usuários com papel de vendedor)
-    @GetMapping("/vendedores")
-    public List<UserDTO> listarVendedores() {
-        return userService.findAllVendedores();
+    @GetMapping("/sellers")
+    public List<UserResponseDTO> listarVendedores() {
+        return userService
+            .findAllSellers()
+            .stream()
+            .map(userMapper::userResponseDtoFromUser)
+            .collect(Collectors.toList());
     }
 
-    // Endpoint para obter um vendedor específico pelo ID (com produtos e feirinhas)
-    @GetMapping("/vendedores/{id}")
-    public UserDetailDTO buscarVendedorPorId(@PathVariable String id) {
-        return userService.findVendedorByIdWithProdutos(id);
-    }
+    @GetMapping("/sellers/{id}")
+    public ResponseEntity<UserInfoResponseDTO> buscarVendedorPorId(@PathVariable String id) {
+        return userService
+            .findSellerById(id)
+            .map(user -> {
+                final UserInfoResponseDTO dto = userMapper.userInfoResponseDtoFromUser(user);
 
-    @GetMapping
-    public List<User> listarUsuarios(){
-        return userService.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<User> buscarPorId(@PathVariable String id) {
-        return userService.findById(id)
-            .map(ResponseEntity::ok)
+                return ResponseEntity.ok(dto);
+            })
             .orElse(ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public List<UserResponseDTO> listarUsuarios(){
+        return userService
+            .findAll()
+            .stream()
+            .map(userMapper::userResponseDtoFromUser)
+            .collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<UserInfoResponseDTO> buscarPorId(@PathVariable String id) {
+        return userService.findById(id)
+            .map(user -> {
+                final UserInfoResponseDTO dto = userMapper.userInfoResponseDtoFromUser(user);
+
+                return ResponseEntity.ok(dto);
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarUsuario(@PathVariable String id) {
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> atualizarUsuario(@PathVariable String id, @RequestBody User userUpdate) {
-        try {
-            User updated = userService.updateUser(id, userUpdate);
-            return ResponseEntity.ok(updated);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id") // Só deixa atualizar se você for admin ou se o usuário for você mesmo
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> atualizarUsuario(@PathVariable String id, @Validated @RequestBody UpdateUserDTO userUpdate) throws BusinessException{
+        final User updated = userService.updateUser(id, userUpdate);
+        final UserResponseDTO responseDto = userMapper.userResponseDtoFromUser(updated);
+        return ResponseEntity.ok(responseDto);
     }
 }

@@ -4,13 +4,15 @@ import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
 import br.imd.ufrn.feirinhas_ufrn.dto.AuthDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.RegisterUserDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.UserResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.exception.AuthFailException;
+import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
 import br.imd.ufrn.feirinhas_ufrn.mappers.UserMapper;
 import br.imd.ufrn.feirinhas_ufrn.services.AuthorizationService;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,28 +23,26 @@ public class AuthenticationController {
     private final AuthorizationService authService;
     private final UserMapper userMapper;
 
-    @SneakyThrows
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Validated @RequestBody AuthDTO dto){
+    public ResponseEntity<String> login(@Validated @RequestBody AuthDTO dto) throws AuthFailException{
         final String token = authService.authenticate(dto);
 
         return ResponseEntity.ok(token);
     }  
 
 
-    @SneakyThrows
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> registerUser(@Validated @RequestBody RegisterUserDTO data){
+    public ResponseEntity<UserResponseDTO> registerUser(@Validated @RequestBody RegisterUserDTO data) throws BusinessException{
         final User createdUser = this.authService.registerUser(data);
         final UserResponseDTO dto = userMapper.userResponseDtoFromUser(createdUser);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(dto); 
     }
 
-    @SneakyThrows
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/registerAdmin")
-    public ResponseEntity<UserResponseDTO> registerAdmin(@Validated @RequestBody RegisterUserDTO data) {
-        final User createdUser = this.authService.registerUser(data);
+    public ResponseEntity<UserResponseDTO> registerAdmin(@Validated @RequestBody RegisterUserDTO data) throws BusinessException{
+        final User createdUser = this.authService.registerAdminUser(data);
         final UserResponseDTO dto = userMapper.userResponseDtoFromUser(createdUser);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);

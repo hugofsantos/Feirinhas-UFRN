@@ -17,7 +17,7 @@ public class UserDetailsServiceImpl implements UserDetailsService{
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     return repository.findByEmail(email)
       .map(UserAuthenticated::new)
-      .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado"));
+      .orElseThrow(() -> new UsernameNotFoundException("Erro ao buscar usuário autenticado por email"));
   }
  
 }

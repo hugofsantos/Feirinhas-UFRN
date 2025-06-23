@@ -1,6 +1,5 @@
 package br.imd.ufrn.feirinhas_ufrn.domain.usuario;
 
-import br.imd.ufrn.feirinhas_ufrn.domain.feira.Feira;
 import br.imd.ufrn.feirinhas_ufrn.domain.produto.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -37,8 +36,8 @@ public class User{
     @OneToMany(mappedBy = "seller")
     private List<Product> products;
 
-    @ManyToMany(mappedBy = "sellers")
-    private List<Feira> feiras;
+    // @ManyToMany(mappedBy = "sellers")
+    // private List<Feira> feiras;
 
     public User(String fullname, String email, String password, String whatsapp, UserRole role){
         this.fullname = fullname;

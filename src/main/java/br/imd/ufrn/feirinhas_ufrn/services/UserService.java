@@ -1,18 +1,16 @@
 package br.imd.ufrn.feirinhas_ufrn.services;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
-import br.imd.ufrn.feirinhas_ufrn.dto.UserDTO;
-import br.imd.ufrn.feirinhas_ufrn.dto.UserDetailDTO;
-import br.imd.ufrn.feirinhas_ufrn.dto.UserResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.domain.usuario.UserRole;
+import br.imd.ufrn.feirinhas_ufrn.dto.UpdateUserDTO;
 import br.imd.ufrn.feirinhas_ufrn.repository.UserRepository;
 import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,24 +29,24 @@ public class UserService {
         repository.deleteById(id);
     }
 
-    public User updateUser(String id, User userUpdate) throws BusinessException {
+    @Transactional(rollbackFor = Exception.class)
+    public User updateUser(String id, UpdateUserDTO userUpdate) throws BusinessException {
         User user = repository.findById(id)
             .orElseThrow(() -> new BusinessException("Usuário não encontrado"));
-        user.setFullname(userUpdate.getFullname());
-        user.setWhatsapp(userUpdate.getWhatsapp());
-        // Não altere email/senha/role aqui por padrão
+
+        if(userUpdate.fullname() != null && !userUpdate.fullname().isBlank()) 
+            user.setFullname(userUpdate.fullname());
+        if(userUpdate.whatsapp() != null)
+            user.setWhatsapp(userUpdate.whatsapp());
+        
         return repository.save(user);
     }
 
-    public List<UserDTO> findAllVendedores() {
-        List<User> users = repository.findAll();
-        return UserDTO.convertFromUserDTO(users);
+    public List<User> findAllSellers() {
+        return repository.findByRole(UserRole.USER); // BUSCA TODOS OS USUÁRIOS COMUNS
     }
 
-    public UserDetailDTO findVendedorByIdWithProdutos(String id) {
-         User user = repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Vendedor não encontrado"));
-
-        return new UserDetailDTO(user);
+    public Optional<User> findSellerById(String id) {
+        return repository.findByIdAndRole(id, UserRole.USER);
     }
 }
