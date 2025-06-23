@@ -1,6 +1,8 @@
 package br.imd.ufrn.feirinhas_ufrn.controller;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserDetailDTO;
 import br.imd.ufrn.feirinhas_ufrn.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +19,14 @@ public class UserController {
 
     // Endpoint para listar todos os vendedores (usuários com papel de vendedor)
     @GetMapping("/vendedores")
-    public List<User> listarVendedores() {
+    public List<UserDTO> listarVendedores() {
         return userService.findAllVendedores();
     }
 
     // Endpoint para obter um vendedor específico pelo ID (com produtos e feirinhas)
     @GetMapping("/vendedores/{id}")
-    public User buscarVendedorPorId(@PathVariable String id) {
-        return userService.findVendedorByIdWithProdutosAndFeirinhas(id);
+    public UserDetailDTO buscarVendedorPorId(@PathVariable String id) {
+        return userService.findVendedorByIdWithProdutos(id);
     }
 
     @GetMapping

@@ -1,9 +1,13 @@
 package br.imd.ufrn.feirinhas_ufrn.services;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserDetailDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserResponseDTO;
 import br.imd.ufrn.feirinhas_ufrn.repository.UserRepository;
 import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,18 +40,15 @@ public class UserService {
         return repository.save(user);
     }
 
-    public List<User> findAllVendedores() {
-        return repository.findAll().stream()
-            .filter(user -> user.getRole().equals("VENDEDOR") || user.getRole().equals("USER")) // ajuste conforme enum/role
-            .collect(Collectors.toList());
+    public List<UserDTO> findAllVendedores() {
+        List<User> users = repository.findAll();
+        return UserDTO.convertFromUserDTO(users);
     }
 
-    public User findVendedorByIdWithProdutosAndFeirinhas(String id) {
-        User user = repository.findById(id)
+    public UserDetailDTO findVendedorByIdWithProdutos(String id) {
+         User user = repository.findById(id)
             .orElseThrow(() -> new RuntimeException("Vendedor não encontrado"));
-        // Supondo que User já tenha os relacionamentos para produtos e feirinhas
-        user.getProdutos().size(); // força carregamento se for LAZY
-        user.getFeirinhas().size();
-        return user;
+
+        return new UserDetailDTO(user);
     }
 }
