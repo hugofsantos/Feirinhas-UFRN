@@ -24,6 +24,10 @@ public class UserAuthenticated implements UserDetails{
       }
   }
 
+  public String getId() {
+    return this.user.getId();
+  }
+
   @Override
   public String getPassword() {
       return this.user.getPassword();

@@ -1,22 +1,84 @@
 package br.imd.ufrn.feirinhas_ufrn.controller;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
-import br.imd.ufrn.feirinhas_ufrn.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.imd.ufrn.feirinhas_ufrn.dto.UpdateUserDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserInfoResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.UserResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
+import br.imd.ufrn.feirinhas_ufrn.mappers.UserMapper;
+import br.imd.ufrn.feirinhas_ufrn.services.UserService;
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("users")
+@RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
+    private final UserMapper userMapper;
+    private final UserService userService;
 
-    @Autowired
-    private UserRepository usuarioRepository; // TODO: CHAMAR O SERVICE 
-
-    @GetMapping
-    public List<User> listarUsuarios(){
-        return usuarioRepository.findAll();
+    @GetMapping("/sellers")
+    public List<UserResponseDTO> listarVendedores() {
+        return userService
+            .findAllSellers()
+            .stream()
+            .map(userMapper::userResponseDtoFromUser)
+            .collect(Collectors.toList());
     }
 
+    @GetMapping("/sellers/{id}")
+    public ResponseEntity<UserInfoResponseDTO> buscarVendedorPorId(@PathVariable String id) {
+        return userService
+            .findSellerById(id)
+            .map(user -> {
+                final UserInfoResponseDTO dto = userMapper.userInfoResponseDtoFromUser(user);
+
+                return ResponseEntity.ok(dto);
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping
+    public List<UserResponseDTO> listarUsuarios(){
+        return userService
+            .findAll()
+            .stream()
+            .map(userMapper::userResponseDtoFromUser)
+            .collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}")
+    public ResponseEntity<UserInfoResponseDTO> buscarPorId(@PathVariable String id) {
+        return userService.findById(id)
+            .map(user -> {
+                final UserInfoResponseDTO dto = userMapper.userInfoResponseDtoFromUser(user);
+
+                return ResponseEntity.ok(dto);
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarUsuario(@PathVariable String id) {
+        userService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id") // Só deixa atualizar se você for admin ou se o usuário for você mesmo
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> atualizarUsuario(@PathVariable String id, @Validated @RequestBody UpdateUserDTO userUpdate) throws BusinessException{
+        final User updated = userService.updateUser(id, userUpdate);
+        final UserResponseDTO responseDto = userMapper.userResponseDtoFromUser(updated);
+        return ResponseEntity.ok(responseDto);
+    }
 }

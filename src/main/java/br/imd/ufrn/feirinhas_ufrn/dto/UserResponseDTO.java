@@ -6,4 +6,4 @@ public record UserResponseDTO (
   String email,
   String whatsapp,
   String role
-) {}
+) { }

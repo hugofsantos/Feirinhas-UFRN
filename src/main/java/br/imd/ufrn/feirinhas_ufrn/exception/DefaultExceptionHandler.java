@@ -1,11 +1,12 @@
 package br.imd.ufrn.feirinhas_ufrn.exception;
 
-import java.nio.file.AccessDeniedException;
 import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -32,7 +33,7 @@ public class DefaultExceptionHandler {
   public ResponseEntity<ApiError> authFailHandler(AuthFailException exception, HttpServletRequest httpRequest) {
     final ApiError error = new ApiError(
         httpRequest.getRequestURI(),
-        HttpStatus.BAD_REQUEST.value(),
+        HttpStatus.UNAUTHORIZED.value(),
         exception.getMessage(),
         OffsetDateTime.now());
 
@@ -79,12 +80,23 @@ public class DefaultExceptionHandler {
     return ResponseEntity.badRequest().body(error);
   }  
 
+  @ExceptionHandler(UsernameNotFoundException.class)
+  public ResponseEntity<ApiError> usernameNotFoundException(UsernameNotFoundException exception, HttpServletRequest httpRequest) {
+    final ApiError error = new ApiError(
+        httpRequest.getRequestURI(),
+        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+        exception.getMessage(),
+        OffsetDateTime.now());
+
+    return ResponseEntity.internalServerError().body(error);
+  }
+
   @ExceptionHandler(RuntimeException.class)
   public ResponseEntity<ApiError> runtimeExceptionHandler(RuntimeException exception,
       HttpServletRequest httpRequest) {
     final ApiError error = new ApiError(
         httpRequest.getRequestURI(),
-        HttpStatus.BAD_REQUEST.value(),
+        HttpStatus.INTERNAL_SERVER_ERROR.value(),
         exception.getMessage(),
         OffsetDateTime.now());
 
