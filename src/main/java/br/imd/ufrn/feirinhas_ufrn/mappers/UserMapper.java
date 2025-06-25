@@ -3,8 +3,8 @@ package br.imd.ufrn.feirinhas_ufrn.mappers;
 import org.springframework.stereotype.Component;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
-import br.imd.ufrn.feirinhas_ufrn.dto.UserInfoResponseDTO;
-import br.imd.ufrn.feirinhas_ufrn.dto.UserResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.user.UserInfoResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.user.UserResponseDTO;
 
 @Component
 public class UserMapper {

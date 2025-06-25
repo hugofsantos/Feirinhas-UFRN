@@ -1,4 +1,4 @@
-package br.imd.ufrn.feirinhas_ufrn.dto;
+package br.imd.ufrn.feirinhas_ufrn.dto.user;
 
 public record UserResponseDTO (
   String id,
