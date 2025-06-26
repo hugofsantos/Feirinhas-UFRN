@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.feirinha.Feirinha;
+import br.imd.ufrn.feirinhas_ufrn.dto.feirinha.BindDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.feirinha.CreateFeirinhaDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.feirinha.FeirinhaInfoResponseDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.feirinha.ResponseFeirinhaDTO;
@@ -93,5 +94,23 @@ public class FeirinhaController {
 
     return ResponseEntity.noContent().build();
   }
+
+  @PreAuthorize("hasRole('ADMIN') or #dto.sellerId == authentication.principal.id")
+  @PostMapping("/bind")
+  public ResponseEntity<Void> bindSellerWithFeirinha(@Validated @RequestBody BindDTO dto) throws BusinessException{
+    this.feirinhaService.bindSellerWithFeirinha(dto.feirinhaId(), dto.sellerId());
+
+    return ResponseEntity.noContent().build();
+  }
+
+  @PreAuthorize("hasRole('ADMIN') or #dto.sellerId == authentication.principal.id")
+  @PostMapping("/unlink")
+  public ResponseEntity<Void> unlinkSellerWithFeirinha(@Validated @RequestBody BindDTO dto)
+      throws BusinessException {
+    this.feirinhaService.unlinkSellerFromFeirinha(dto.feirinhaId(), dto.sellerId());
+
+    return ResponseEntity.noContent().build();
+  }  
+  
   
 }
