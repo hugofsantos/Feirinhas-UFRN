@@ -31,10 +31,10 @@ public class SecurityConfigurations {
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                     .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/users/sellers").permitAll()
                     .requestMatchers(HttpMethod.GET, "/users/sellers/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/photo/download/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/feirinhas/**").permitAll()
                     .anyRequest().authenticated()
             ).addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
             .build();

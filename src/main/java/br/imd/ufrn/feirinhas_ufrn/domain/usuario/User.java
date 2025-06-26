@@ -1,5 +1,6 @@
 package br.imd.ufrn.feirinhas_ufrn.domain.usuario;
 
+import br.imd.ufrn.feirinhas_ufrn.domain.feirinha.Feirinha;
 import br.imd.ufrn.feirinhas_ufrn.domain.produto.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name = "users")
@@ -41,8 +43,16 @@ public class User{
     )
     private List<Product> products;
 
-    // @ManyToMany(mappedBy = "sellers")
-    // private List<Feira> feiras;
+    @ManyToMany(mappedBy = "sellers")
+    private List<Feirinha> feirinhas = new ArrayList<>();
+
+    // Método de callback do JPA
+    @PreRemove
+    private void removerAssociacoesDeFeirinhas() {
+        for (Feirinha feirinha : this.feirinhas) {
+            feirinha.getSellers().remove(this);
+        }
+    }
 
     public User(String fullname, String email, String password, String whatsapp, UserRole role){
         this.fullname = fullname;
