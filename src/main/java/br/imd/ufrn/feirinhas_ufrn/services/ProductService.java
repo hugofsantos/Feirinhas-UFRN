@@ -5,7 +5,9 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import br.imd.ufrn.feirinhas_ufrn.components.PhotoStorageComponent;
 import br.imd.ufrn.feirinhas_ufrn.domain.produto.Product;
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
 import br.imd.ufrn.feirinhas_ufrn.dto.product.UpdateProductDTO;
@@ -18,12 +20,18 @@ import lombok.RequiredArgsConstructor;
 public class ProductService {
   private final ProductRepository productRepository;
   private final UserService userService;
+  private final PhotoStorageComponent photoStorageComponent;
 
   @Transactional(rollbackFor = Exception.class)
-  public Product create(Product product) throws BusinessException{
+  public Product create(Product product, MultipartFile productImg) throws BusinessException{
     final User findedSeller = userService
       .findSellerById(product.getSeller().getId())
       .orElseThrow(() -> new BusinessException("Não existe nenhum vendedor com esse ID"));
+
+    if(productImg != null && !productImg.isEmpty()) {
+      final String imgUrl = photoStorageComponent.storePhoto(productImg);
+      product.setPhotoPath(imgUrl);
+    }
 
     product.setSeller(findedSeller);
     return this.productRepository.save(product);

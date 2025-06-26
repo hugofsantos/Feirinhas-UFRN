@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import br.imd.ufrn.feirinhas_ufrn.domain.produto.Product;
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
 import br.imd.ufrn.feirinhas_ufrn.dto.product.CreateProductDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.product.ProductResponseDTO;
 
 @Component
 public class ProductMapper {
@@ -24,5 +25,19 @@ public class ProductMapper {
     product.setPriceInCents(dto.priceInCents());
 
     return product;
+  }
+
+  public ProductResponseDTO responseDtoFromProduct(Product product) {
+    if (product == null) return null;
+
+    final ProductResponseDTO dto = new ProductResponseDTO(
+      product.getSeller().getId(),
+      product.getName(),
+      product.getDescription(),
+      product.getPriceInCents(),
+      product.getPhotoPath()
+    );
+
+    return dto;
   }
 }

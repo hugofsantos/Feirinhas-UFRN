@@ -22,6 +22,8 @@ public class Product {
 
     private Long priceInCents;
 
+    private String photoPath;
+
     @ManyToOne
     private User seller;
 
