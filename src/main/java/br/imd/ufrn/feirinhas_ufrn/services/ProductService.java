@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+
   private final ProductRepository productRepository;
   private final UserService userService;
   private final PhotoStorageComponent photoStorageComponent;
@@ -61,8 +62,17 @@ public class ProductService {
     return this.productRepository.save(productToUpdate);
   }
 
-  public void deleteById(String productId) {
-    // TODO
+  public void deleteById(String productId) throws BusinessException{
+    final Product productToDelete = this.productRepository
+      .findById(productId)
+      .orElseThrow(() -> new BusinessException("Não existe nenhum produto com esse ID"));
     
+    final String photoToDelete = productToDelete.getPhotoPath(); 
+
+    if(productToDelete != null && !photoToDelete.isBlank()) { // Se tiver foto, remove
+      this.photoStorageComponent.deletePhoto(photoToDelete);
+    }
+    
+    this.productRepository.deleteById(productId);
   }
 }
