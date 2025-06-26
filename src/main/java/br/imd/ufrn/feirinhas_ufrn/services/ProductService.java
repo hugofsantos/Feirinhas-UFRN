@@ -46,9 +46,19 @@ public class ProductService {
   }
 
   @Transactional(rollbackFor = Exception.class)
-  public Product updateProduct(String productId, UpdateProductDTO dto) {
-    // TODO
-    return null;
+  public Product updateProduct(String productId, UpdateProductDTO dto) throws BusinessException{
+    final Product productToUpdate = this.productRepository
+      .findById(productId)
+      .orElseThrow(() -> new BusinessException("Não existe nenhum produto com esse ID"));
+    
+    if(dto.name() != null && !dto.name().isBlank())
+      productToUpdate.setName(dto.name());
+    if(dto.description() != null)
+      productToUpdate.setDescription(dto.description());
+    if(dto.priceInCents() != null)
+      productToUpdate.setPriceInCents(dto.priceInCents());
+    
+    return this.productRepository.save(productToUpdate);
   }
 
   public void deleteById(String productId) {

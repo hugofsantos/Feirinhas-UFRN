@@ -9,6 +9,7 @@ import br.imd.ufrn.feirinhas_ufrn.domain.produto.Product;
 import br.imd.ufrn.feirinhas_ufrn.dto.product.CreateProductDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.product.ProductInfoResponseDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.product.ProductResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.product.UpdateProductDTO;
 import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
 import br.imd.ufrn.feirinhas_ufrn.mappers.ProductMapper;
 import br.imd.ufrn.feirinhas_ufrn.services.ProductService;
@@ -23,7 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
@@ -68,6 +71,18 @@ public class ProductsController {
       .collect(Collectors.toList());
 
     return ResponseEntity.ok(products);
+  }
+
+  @PreAuthorize("hasRole('ADMIN') or @productSecurity.isOwner(#productId, authentication.principal.id)")
+  @PatchMapping("/{productId}")
+  public ResponseEntity<ProductResponseDTO> updateProduct(
+    @PathVariable(required = true) String productId,
+    @Validated @RequestBody UpdateProductDTO updateProductDTO
+  ) throws BusinessException{
+    final Product updatedProduct = this.productService.updateProduct(productId, updateProductDTO);
+    final ProductResponseDTO responseDTO = productMapper.responseDtoFromProduct(updatedProduct);
+
+    return ResponseEntity.ok(responseDTO);
   }
   
   
