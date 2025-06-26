@@ -1,9 +1,9 @@
 package br.imd.ufrn.feirinhas_ufrn.controller;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
-import br.imd.ufrn.feirinhas_ufrn.dto.UpdateUserDTO;
-import br.imd.ufrn.feirinhas_ufrn.dto.UserInfoResponseDTO;
-import br.imd.ufrn.feirinhas_ufrn.dto.UserResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.user.UpdateUserDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.user.UserInfoResponseDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.user.UserResponseDTO;
 import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
 import br.imd.ufrn.feirinhas_ufrn.mappers.UserMapper;
 import br.imd.ufrn.feirinhas_ufrn.services.UserService;
@@ -69,7 +69,7 @@ public class UserController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarUsuario(@PathVariable String id) {
+    public ResponseEntity<Void> deletarUsuario(@PathVariable String id) throws BusinessException{
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

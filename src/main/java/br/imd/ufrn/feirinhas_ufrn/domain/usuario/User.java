@@ -33,7 +33,12 @@ public class User{
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @OneToMany(mappedBy = "seller")
+    @OneToMany(
+        mappedBy = "seller", 
+        cascade = CascadeType.REMOVE,
+        orphanRemoval = true, // Remover um produto que não tenha nenhum usuário associado
+        fetch = FetchType.LAZY // Boa prática de performance
+    )
     private List<Product> products;
 
     // @ManyToMany(mappedBy = "sellers")

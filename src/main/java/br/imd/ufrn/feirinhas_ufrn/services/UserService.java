@@ -2,7 +2,7 @@ package br.imd.ufrn.feirinhas_ufrn.services;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.UserRole;
-import br.imd.ufrn.feirinhas_ufrn.dto.UpdateUserDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.user.UpdateUserDTO;
 import br.imd.ufrn.feirinhas_ufrn.repository.UserRepository;
 import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,9 @@ public class UserService {
         return repository.findById(id);
     }
 
-    public void deleteById(String id) {
+    public void deleteById(String id) throws BusinessException{
+        repository.findById(id).orElseThrow(() -> new BusinessException("Usuário não encontrado"));
+
         repository.deleteById(id);
     }
 

@@ -2,8 +2,8 @@ package br.imd.ufrn.feirinhas_ufrn.services;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
 import br.imd.ufrn.feirinhas_ufrn.domain.usuario.UserRole;
-import br.imd.ufrn.feirinhas_ufrn.dto.AuthDTO;
-import br.imd.ufrn.feirinhas_ufrn.dto.RegisterUserDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.auth.AuthDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.auth.RegisterUserDTO;
 import br.imd.ufrn.feirinhas_ufrn.exception.AuthFailException;
 import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
 import br.imd.ufrn.feirinhas_ufrn.repository.UserRepository;

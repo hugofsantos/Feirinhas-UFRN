@@ -4,7 +4,7 @@ import br.imd.ufrn.feirinhas_ufrn.domain.usuario.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Table(name = "product")
+@Table(name = "products")
 @Entity
 @Getter
 @Setter
@@ -20,7 +20,9 @@ public class Product {
 
     private String description;
 
-    private String price;
+    private Long priceInCents;
+
+    private String photoPath;
 
     @ManyToOne
     private User seller;
