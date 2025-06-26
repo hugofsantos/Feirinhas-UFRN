@@ -28,7 +28,7 @@ public class PhotoController {
   public ResponseEntity<Resource> downloadPhoto(@PathVariable(required = true) String fileName) throws Exception{
     // Caminho completo do arquivo
     Path filePath = Paths.get(photoStorageComponent.getFileFullPath(fileName)).normalize();
-    System.out.println("CAMINHO DA IMAGEEEEEEEEEEEEEEEEEEEEEEEEEEEM: " + photoStorageComponent.getFileFullPath(fileName));
+
     // Verificar se o arquivo existe e é legível
     if (!Files.exists(filePath) || !Files.isReadable(filePath)) {
         throw new EntityNotFoundException("Arquivo não encontrado ou não pode ser lido: " + fileName);

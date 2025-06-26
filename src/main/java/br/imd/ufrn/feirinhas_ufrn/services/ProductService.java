@@ -38,8 +38,7 @@ public class ProductService {
   } 
 
   public Optional<Product> findById(String id) {
-    // TODO
-    return Optional.empty();
+    return this.productRepository.findById(id);
   }
 
   public List<Product> findAllProducts() {

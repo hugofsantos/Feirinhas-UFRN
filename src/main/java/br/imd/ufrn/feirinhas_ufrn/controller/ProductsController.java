@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import br.imd.ufrn.feirinhas_ufrn.domain.produto.Product;
 import br.imd.ufrn.feirinhas_ufrn.dto.product.CreateProductDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.product.ProductInfoResponseDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.product.ProductResponseDTO;
 import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
 import br.imd.ufrn.feirinhas_ufrn.mappers.ProductMapper;
@@ -19,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 
 @RestController
@@ -41,5 +44,18 @@ public class ProductsController {
 
     return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
   }
+
+  @GetMapping("/{productId}")
+  public ResponseEntity<ProductInfoResponseDTO> findProductById(@PathVariable(required = true) String productId) {
+    return productService
+      .findById(productId)
+      .map(product -> {
+        final ProductInfoResponseDTO dto = productMapper.productInfoByProduct(product);
+
+        return ResponseEntity.ok(dto);
+      })
+      .orElse(ResponseEntity.notFound().build());
+  }
+  
   
 }
