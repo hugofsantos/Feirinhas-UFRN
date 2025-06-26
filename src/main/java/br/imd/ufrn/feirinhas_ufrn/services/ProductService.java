@@ -62,6 +62,25 @@ public class ProductService {
     return this.productRepository.save(productToUpdate);
   }
 
+  public void updateProductPhoto(String productId, MultipartFile newPhoto) throws BusinessException{
+    final Product findedProduct = this.productRepository
+      .findById(productId)
+      .orElseThrow(() -> new BusinessException("Não existe nenhum produto com esse ID"));
+
+    final String oldPhotoPath = findedProduct.getPhotoPath();
+
+    if(oldPhotoPath != null && !oldPhotoPath.isBlank())
+      this.photoStorageComponent.deletePhoto(oldPhotoPath); // Remove a foto antiga
+    
+    String newPhotoPath = null;
+
+    if(newPhoto != null && !newPhoto.isEmpty())
+      newPhotoPath = this.photoStorageComponent.storePhoto(newPhoto);
+    
+    findedProduct.setPhotoPath(newPhotoPath);
+    this.productRepository.save(findedProduct);
+  }
+
   public void deleteById(String productId) throws BusinessException{
     final Product productToDelete = this.productRepository
       .findById(productId)

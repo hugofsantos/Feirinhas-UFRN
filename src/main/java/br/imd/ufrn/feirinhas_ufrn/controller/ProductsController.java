@@ -87,6 +87,17 @@ public class ProductsController {
   }
 
   @PreAuthorize("hasRole('ADMIN') or @productSecurity.isOwner(#productId, authentication.principal.id)")
+  @PatchMapping("/{productId}/updatePhoto")
+  public ResponseEntity<Void> updateProductPhoto(
+    @PathVariable(required = true) String productId,
+    @RequestPart(required = false) MultipartFile productImg
+  ) throws BusinessException {
+    this.productService.updateProductPhoto(productId, productImg);
+
+    return ResponseEntity.noContent().build();
+  }
+
+  @PreAuthorize("hasRole('ADMIN') or @productSecurity.isOwner(#productId, authentication.principal.id)")
   @DeleteMapping("/{productId}")
   public ResponseEntity<Void> deleteProduct(
     @PathVariable(required = true) String productId
