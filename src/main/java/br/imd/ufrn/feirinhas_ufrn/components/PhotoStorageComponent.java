@@ -90,7 +90,6 @@ public class PhotoStorageComponent {
   }
   
   public String getFileFullPath(String fileName) {
-
     // Combina o diretório base com o nome do arquivo
     Path filePath = Paths.get(this.baseUploadDir, fileName);
     return filePath.toString();
