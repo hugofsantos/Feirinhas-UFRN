@@ -14,6 +14,9 @@ import br.imd.ufrn.feirinhas_ufrn.mappers.ProductMapper;
 import br.imd.ufrn.feirinhas_ufrn.services.ProductService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +25,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 
 @RestController
 @RequestMapping("/products")
@@ -56,6 +58,18 @@ public class ProductsController {
       })
       .orElse(ResponseEntity.notFound().build());
   }
+
+  @GetMapping()
+  public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
+    final List<ProductResponseDTO> products = this.productService
+      .findAllProducts()
+      .stream()
+      .map(productMapper::responseDtoFromProduct)
+      .collect(Collectors.toList());
+
+    return ResponseEntity.ok(products);
+  }
+  
   
   
 }

@@ -42,8 +42,7 @@ public class ProductService {
   }
 
   public List<Product> findAllProducts() {
-    // TODO
-    return List.of();
+    return this.productRepository.findAll();
   }
 
   @Transactional(rollbackFor = Exception.class)
