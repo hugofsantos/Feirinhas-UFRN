@@ -2,7 +2,7 @@ package br.imd.ufrn.feirinhas_ufrn.dto.user;
 
 import java.util.List;
 
-import br.imd.ufrn.feirinhas_ufrn.domain.produto.Product;
+import br.imd.ufrn.feirinhas_ufrn.dto.product.ProductResponseDTO;
 
 public record UserInfoResponseDTO (
   String id,
@@ -10,5 +10,5 @@ public record UserInfoResponseDTO (
   String email,
   String whatsapp,
   String role,
-  List<Product> products
+  List<ProductResponseDTO> products
 ){}
