@@ -7,6 +7,7 @@ import br.imd.ufrn.feirinhas_ufrn.domain.feirinha.Feirinha;
 import br.imd.ufrn.feirinhas_ufrn.dto.feirinha.CreateFeirinhaDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.feirinha.FeirinhaInfoResponseDTO;
 import br.imd.ufrn.feirinhas_ufrn.dto.feirinha.ResponseFeirinhaDTO;
+import br.imd.ufrn.feirinhas_ufrn.dto.feirinha.UpdateFeirinhaDTO;
 import br.imd.ufrn.feirinhas_ufrn.exception.BusinessException;
 import br.imd.ufrn.feirinhas_ufrn.mappers.FeirinhaMapper;
 import br.imd.ufrn.feirinhas_ufrn.services.FeirinhaService;
@@ -23,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
@@ -67,6 +69,18 @@ public class FeirinhaController {
         return ResponseEntity.ok(responseDto);
       })
       .orElse(ResponseEntity.notFound().build());
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @PatchMapping("/{feirinhaId}")
+  public ResponseEntity<ResponseFeirinhaDTO> updateFeirinha(
+    @PathVariable(required = true) String feirinhaId,
+    @Validated @RequestBody UpdateFeirinhaDTO updateDTO
+  ) throws BusinessException {
+    final Feirinha updatedFeirinha = this.feirinhaService.updateFeirinha(feirinhaId, updateDTO);
+    final ResponseFeirinhaDTO responseDTO = this.feirinhaMapper.responseDtoFromFeirinha(updatedFeirinha);
+
+    return ResponseEntity.ok(responseDTO);
   }
   
 }
